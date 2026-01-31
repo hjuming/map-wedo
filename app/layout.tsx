@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Moltbot Map Hub",
-  description: "Your Personal Lifestyle Map Database - Food, Dive, Pet, Travel",
+  title: "Map WEDO | 生活地圖",
+  description: "您的個人化生活風格地圖資料庫 - 美食、潛水、寵物、旅遊",
 };
 
 export default function RootLayout({
