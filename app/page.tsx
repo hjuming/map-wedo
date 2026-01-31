@@ -185,6 +185,10 @@ export default function Home() {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name)}`
   }
 
+  const [searchExpanded, setSearchExpanded] = useState(false) // New State
+
+  // ... (inside component) ...
+
   return (
     <main>
       {/* Header */}
@@ -196,19 +200,7 @@ export default function Home() {
             <span>Map WEDO</span>
           </a>
 
-          {/* 2. Search */}
-          <div className="header-search">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-            <input
-              type="text"
-              placeholder="搜尋地點、標籤..."
-              className="search-input"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          {/* 3. Categories */}
+          {/* 2. Categories (Middle) */}
           <div className="header-categories">
             {CATEGORIES.map(cat => (
               <button
@@ -216,14 +208,39 @@ export default function Home() {
                 className={`cat-tab ${activeCategory === cat.id ? `active-${cat.id}` : ''}`}
                 onClick={() => {
                   setActiveCategory(cat.id)
-                  setActiveTag('') // Reset sub-tag
-                  setPage(1) // Reset pagination
+                  setActiveTag('')
+                  setPage(1)
                 }}
               >
                 <cat.icon size={16} />
                 {cat.label}
               </button>
             ))}
+          </div>
+
+          {/* 3. Search (Right, Expandable) */}
+          <div className="header-search">
+            <div className="search-wrapper">
+              <button
+                className="search-icon-btn"
+                onClick={() => {
+                  setSearchExpanded(!searchExpanded)
+                  if (!searchExpanded) document.getElementById('search-input')?.focus()
+                }}
+              >
+                <Search size={20} />
+              </button>
+
+              <input
+                id="search-input"
+                type="text"
+                placeholder="搜尋地點..."
+                className={`search-input ${searchExpanded || searchTerm ? 'expanded' : ''}`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onBlur={() => !searchTerm && setSearchExpanded(false)}
+              />
+            </div>
           </div>
         </div>
       </nav>
@@ -275,10 +292,20 @@ export default function Home() {
                       )}
                     </div>
 
-                    <div className="place-address">
-                      <MapPin size={14} className="mt-1 shrink-0 opacity-70" />
-                      <span>{place.address || cleanAddress(place.metadata) || "No Address"}</span>
-                    </div>
+                    {/* Address with Icon */}
+                    {(place.address || (place.metadata?.original_description && place.category === 'pet')) && (
+                      <div className="place-address">
+                        <MapPin size={14} className="mt-1 shrink-0 opacity-70" />
+                        <span>{place.address || cleanAddress(place.metadata)}</span>
+                      </div>
+                    )}
+
+                    {/* Description Paragraph (Cleaned) */}
+                    {place.metadata?.description && place.metadata.description.length > 2 && (
+                      <p className="text-sm text-slate-400 leading-relaxed line-clamp-3 mt-2">
+                        {place.metadata.description}
+                      </p>
+                    )}
 
                     <div className="place-tags">
                       {/* Show category as first tag */}
